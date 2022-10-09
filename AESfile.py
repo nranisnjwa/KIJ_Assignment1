@@ -16,7 +16,7 @@ def getIV(blocksize):
 
 def encrypt_image(filename, key, iv):
 
-    BLOCKSIZE = 16
+    
     encrypted_filename = "encr_" + filename
 
     with open(filename, "rb") as file1:
@@ -34,7 +34,7 @@ def encrypt_image(filename, key, iv):
 
 def decrypted_image(filename, key, iv):
 
-    BLOCKSIZE = 16
+    
     decrypted_filename = "decr_" + filename
 
     with open(filename, "rb") as file1:
