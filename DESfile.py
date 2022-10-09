@@ -17,7 +17,7 @@ def getIV(blocksize):
 def encrypt_image(filename, key, iv):
 
     BLOCKSIZE = 8
-    encrypted_filename = "encrypted_" + filename
+    encrypted_filename = "encr_" + filename
 
     with open(filename, "rb") as file1:
         data = file1.read()
@@ -35,7 +35,7 @@ def encrypt_image(filename, key, iv):
 def decrypted_image(filename, key, iv):
 
     BLOCKSIZE = 8
-    decrypted_filename = "decrypted_" + filename
+    decrypted_filename = "decr_" + filename
 
     with open(filename, "rb") as file1:
         data = file1.read()
