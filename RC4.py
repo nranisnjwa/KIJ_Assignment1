@@ -5,10 +5,10 @@ from Crypto.Random import get_random_bytes
 
 
 
-def enc(key,plaintext):
+def encrypt(key,plaintext):
 		return ARC4.new(key).encrypt(plaintext)
 
-def dec(key,msg):
+def decrypt(key,msg):
 		return ARC4.new(key).decrypt(msg)
 
 
