@@ -4,7 +4,7 @@ location = r'C:\Users\USER\work\Usopp.jpg'
 key = int(input('Enter Key to encrypt Image: '))
      
 print('The location file is: ', location)
-print('Key for Encryption is: ', key)
+print('Key for Encryption Image is: ', key)
 
 fin = open(location, 'rb')
      
