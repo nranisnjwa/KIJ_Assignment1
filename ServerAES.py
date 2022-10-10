@@ -2,30 +2,35 @@ import socket
 import tqdm
 import os
 
-SEPARATOR = "<SEPARATOR>"
+SERVER_HOST = "0.0.0.0"
+SERVER_PORT = 5001
 BUFFER_SIZE = 4096
-
-host = "192.168.1.101"
-port = 5001
-filename = "zoro.png"
-filesize = os.path.getsize(filename)
+SEPERATOR = "<SEPARATOR>"
 
 s = socket.socket()
+s.bind((SERVER_HOST, SERVER_PORT))
 
-print(f"[+] Connecting to {host} : {port}")
-s.connect ((host, port))
-print("[+] Connected.")
+s.listen(5)
+print(f"[*] Listening as {SERVER_HOST} : {SERVER_PORT}")
 
-s.send(f"{filename}{SEPARATOR}{filesize}".encode())
+client_socket, address = s.accept()
+print(f"[+] {address} is connected.")
 
-progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit-"B", unit_scale=True, unit_divisor=1024)
-with open(filename, "rb") as f:
+received = client_socket.recv(BUFFER_SIZE).decode()
+filename, filesize = received.split(SEPERATOR)
+
+filename = os.path.basename(filename)
+filesize = int(filesize)
+
+progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit-"B", unit_scale=True, unit_divisor=1024)
+with open(filename, "wb")as f:
 
     while True:
-        bytes_read = f.read(BUFFER_SIZE)
+        bytes_read = client_socket.recv(BUFFER_SIZE)
         if not bytes_read:
             break
-        s.sendall(bytes_read)
+        f.write(bytes_read)
         progress.update(len(bytes_read))
 
+client_socket.close()
 s.close()
