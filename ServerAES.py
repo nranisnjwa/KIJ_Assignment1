@@ -1,43 +1,31 @@
-
-from fileinput import filename
 import socket
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
-from Crypto.Random import get_random_bytes
+import tqdm
+import os
 
+SEPARATOR = "<SEPARATOR>"
+BUFFER_SIZE = 4096
 
-sock = socket.socket()
-sock.bind(('0.0.0.0', 5001))
-sock.listen(5)
+host = "192.168.1.101"
+port = 5001
+filename = "zoro.png"
+filesize = os.path.getsize(filename)
 
-filename="zoro.png"
+s = socket.socket()
 
-while True:
-    con, addr = sock.accept()
-    print('Connected with ', addr)
-    data = con.recv(1024)
-    print(data.decode())
-    
-    key = get_random_bytes(32)
-    print(key)
+print(f"[+] Connecting to {host} : {port}")
+s.connect ((host, port))
+print("[+] Connected.")
 
-    
-    
-    cipher = AES.new(key, AES.MODE_CBC) 
-    ciphered_data = cipher.encrypt(pad(data, AES.block_size)) 
-    file_out = open("encr_"+filename, "wb") 
-    file_out.write(cipher.iv)
-    file_out.write(ciphered_data) 
-    file_out.close()
-    
-    file = open("encr_"+filename,"rb")
-    data = file.read()
-   
-    while(data):
-        con.send(data)
-        data = file.read()
-    
-    print('File has been transferred successfully.')
+s.send(f"{filename}{SEPARATOR}{filesize}".encode())
 
-    con.close()
-    break
+progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit-"B", unit_scale=True, unit_divisor=1024)
+with open(filename, "rb") as f:
+
+    while True:
+        bytes_read = f.read(BUFFER_SIZE)
+        if not bytes_read:
+            break
+        s.sendall(bytes_read)
+        progress.update(len(bytes_read))
+
+s.close()
