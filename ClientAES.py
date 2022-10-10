@@ -1,42 +1,32 @@
 import socket
-from Crypto.Cipher import AES 
-from Crypto.Util.Padding import unpad
+import tqdm
+import os
 
-sock = socket.socket()
+SEPARATOR = "<SEPARATOR>"
+BUFFER_SIZE = 4096
 
+host = "192.168.1.101"
 port = 5001
-host ='localhost'
-
-sock.connect((host,port))
-print('Connected to server')
-sock.send('Client is connected'.encode())
-
-data = sock.recv(99999)
-
 filename = "zoro.png"
+filesize = os.path.getsize(filename)
 
+s = socket.socket()
 
-while(data):
-    
-   
-    file_in = open(filename, 'rb') 
-    iv = file_in.read(16) 
-    ciphered_data = file_in.read()
+print(f"[+] Connecting to {host} : {port}")
+s.connect ((host, port))
+print("[+] Connected.")
 
-    cipher = AES.new(key, AES.MODE_CBC, iv=iv) 
-    original_data = unpad(cipher.decrypt(ciphered_data), AES.block_size) 
-    
-    
-    file_out = open("decr_"+filename, "wb") 
-    file_out.write(original_data)
-    
-    data = sock.recv(99999)
+s.send(f"{filename}{SEPARATOR}{filesize}".encode())
 
-print('File has been received successfully.')
+progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit-"B", unit_scale=True, unit_divisor=1024)
+with open(filename, "rb") as f:
 
-file_out.close()
-file_in.close()
-sock.close()
-print('Connection Closed.')
+    while True:
+        bytes_read = f.read(BUFFER_SIZE)
+        if not bytes_read:
+            break
+        s.sendall(bytes_read)
+        progress.update(len(bytes_read))
 
+s.close()
 
